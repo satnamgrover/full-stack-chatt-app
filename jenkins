@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('PUll Code') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('build'){
+            steps {
+                sh "docker build -t frontend ./frontend/Dockerfile"
+                sh "docker build -t backend ./backend/Dockerfile"
+            }
+        }
+        stage('deploy'){
+            steps {
+                sh "docker-compose up --build -d"
+            }
+        }
+    }
+}
+
