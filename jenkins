@@ -5,7 +5,7 @@ pipeline {
         stage('PUll Code') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/satnamgrover/full-stack-chatt-app.git
+                    url: 'https://github.com/satnamgrover/full-stack-chatt-app.git'
             }
         }
         stage('build'){
