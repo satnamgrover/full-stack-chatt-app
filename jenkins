@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('PUll Code') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    url: 'https://github.com/satnamgrover/full-stack-chatt-app.git
             }
         }
         stage('build'){
