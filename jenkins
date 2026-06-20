@@ -10,8 +10,8 @@ pipeline {
         }
         stage('build'){
             steps {
-                sh "docker build -t frontend ./frontend/Dockerfile"
-                sh "docker build -t backend ./backend/Dockerfile"
+                sh "docker build -t frontend ./frontend/"
+                sh "docker build -t backend ./backend/"
             }
         }
         stage('deploy'){
