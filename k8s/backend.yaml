@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: backend:latest
+          image: satnam45/backend:latest
           imagePullPolicy: Never
           env:
             - name: JWT_SECRET
