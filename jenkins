@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('checkout code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/satnamgrover/full-stack-chatt-app.git'
+            }
+        }
+        stage('Build & tag') {
+            steps {
+                sh ''' docker build -t frontend ./frontend/
+                docker build -t backend ./backend
+                '''
+            }
+        }
+        stage('login to registry') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'creds',
+                        usernameVariable: 'username',
+                        passwordVariable: 'pass'
+                        )
+                ]) {
+                    sh '''
+                    echo $pass | docker login -u $username --password-stdin
+                    docker image tag frontend:latest $username/frontend:latest
+                    docker image tag backend:latest $username/backend:latest
+                    docker push $username/frontend:latest
+                    docker push $username/backend:latest
+                    '''
+                }
+                
+                
+            }
+        }
+      
+        stage('deploy') {
+            steps {
+                sh ''' 
+                 export KUBECONFIG=/var/lib/jenkins/.kube/config
+                 kubectl apply -f k8s/namespace.yaml && kubectl apply -f k8s/secrets.yaml
+                 kubectl apply -f ./k8s/
+            '''
+            }
+        }
+        stage('open to world'){
+            steps {
+                sh '''
+                kubectl port-forward -n chat-app svc/frontend-service 3000:3000 --address=0.0.0.0 &
+                kubectl port-forward -n chat-app svc/backend-service 8080:8080 --address=0.0.0.0 &
+                '''
+            }
+        }
+       }
+    }
+
