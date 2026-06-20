@@ -15,8 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend-container
-          image: frontend:latest
-          imagePullPolicy: Never
+          image: satnam45/frontend:latest
           ports:
             - containerPort: 3000
 
