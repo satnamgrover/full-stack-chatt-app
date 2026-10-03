@@ -41,8 +41,7 @@ pipeline {
             steps {
                 sh ''' 
                  export KUBECONFIG=/var/lib/jenkins/.kube/config
-                 kubectl apply -f k8s/namespace.yaml && kubectl apply -f k8s/secrets.yaml
-                 kubectl apply -f ./k8s/
+                 helm install chat-app ./helm/chat-app
             '''
             }
         }
