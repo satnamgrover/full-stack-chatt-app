@@ -1,0 +1,46 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.frontend.deploymentName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.appLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.appLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.frontend.containerName }}
+          image: "{{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}"
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.frontend.containerPort }}
+          env:
+            - name: BROWSER
+              value: {{ .Values.frontend.browser | quote }}
+
+            - name: HOST
+              value: {{ .Values.frontend.host | quote }} 
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.frontend.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.frontend.appLabel }}
+  type: {{ .Values.frontend.serviceType }}
+  ports:
+    - port: {{ .Values.frontend.servicePort }}
+      targetPort: {{ .Values.frontend.targetPort }}
+      nodePort: {{ .Values.frontend.nodePort }}
+
+

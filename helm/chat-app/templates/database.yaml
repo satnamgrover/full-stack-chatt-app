@@ -1,0 +1,56 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.database.statefulSetName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.database.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.database.appLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.database.appLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.database.containerName }}
+          image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.database.containerPort }}
+
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mysql-user
+
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mysql-pass
+
+            - name: MYSQL_DATABASE
+              value: {{ .Values.database.name | quote }}
+
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mysql-root
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.database.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.database.appLabel }}
+  ports:
+    - port: {{ .Values.database.servicePort }}
+      targetPort: {{ .Values.database.targetPort }}

@@ -1,0 +1,68 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.backend.deploymentName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.appLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.appLabel }}
+    spec:
+      containers:
+        - name: {{ .Values.backend.containerName }}
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: jwt-secret
+
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.backend.database.url | quote }}
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mysql-user
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: mysql-pass
+
+            - name: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.backend.springProfile | quote }}
+
+            - name: SERVER_PORT
+              value: {{ .Values.backend.containerPort | quote }}
+
+          ports:
+            - containerPort: {{ .Values.backend.containerPort }}
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.backend.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.backend.appLabel }}
+  type: {{ .Values.backend.serviceType }}
+  ports:
+    - port: {{ .Values.backend.servicePort }}
+      targetPort: {{ .Values.backend.targetPort }}
+      nodePort: {{ .Values.backend.nodePort }}
+
+

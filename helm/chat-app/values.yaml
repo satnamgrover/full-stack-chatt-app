@@ -1,0 +1,88 @@
+namespace: chat-app
+
+
+# Frontend
+frontend:
+  deploymentName: frontend-deployment
+  serviceName: frontend-service
+  replicas: 1
+  appLabel: frontend
+  containerName: frontend-container
+
+  image:
+    repository: <Your Image Name>
+    tag: latest
+    pullPolicy: ifNotPersent
+
+  containerPort: 3000
+  browser: "none"
+  host: "0.0.0.0"  
+
+  serviceType: NodePort
+  servicePort: 3000
+  targetPort: 3000
+  nodePort: 31227
+
+
+# Backend
+backend:
+  deploymentName: backend-deployment
+  serviceName: backend-service
+  replicas: 1
+  appLabel: backend
+  containerName: backend-container
+
+  image:
+    repository: <Your Image Name>
+    tag: latest
+    pullPolicy: IfNotPersent
+
+  database:
+    url: jdbc:mysql://mysql:3306/chattingo
+
+  springProfile: development
+
+  containerPort: 8080
+
+  serviceType: NodePort
+  servicePort: 8080
+  targetPort: 8080
+  nodePort: 31220
+
+
+# Database
+database:
+
+  pv:
+    name: mysql-pv
+    storage: 500Mi
+    accessMode: ReadWriteOnce
+    hostPath: <Your Storage Path>
+
+  pvc:
+    name: mysql-pvc
+    storage: 500Mi
+    accessMode: ReadWriteOnce
+
+  statefulSetName: database
+  serviceName: mysql
+  replicas: 1
+  appLabel: database
+  containerName: mysql-container
+
+  image:
+    repository: mysql
+    tag: "8.0"
+
+  containerPort: 3306
+  name: chattingo
+  servicePort: 3306
+  targetPort: 3306
+
+
+# Secret
+backendSecret:
+  jwtSecret: "< Your Jwt Secret key >"
+  mysqlUser: "< Your Database Username >"
+  mysqlPass: "< Your User Pass >"
+  mysqlRoot: "< Your Root Pass >"
