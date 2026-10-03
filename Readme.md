@@ -1,188 +1,290 @@
-# FULL STACK CHAT APP - CHATTINGO
+# 💬 Full Stack Real-Time Chat Application — Containerized, Orchestrated & Automated
 
-A full-stack web application (React frontend + Spring Boot backend + database) forked and used as a hands-on playground for practicing DevOps workflows — containerization, orchestration, and CI/CD — in a setup that mirrors a real production/development environment.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![WebSocket](https://img.shields.io/badge/WebSocket-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Helm](https://img.shields.io/badge/Helm-0F1689?style=for-the-badge&logo=helm&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
 
-> This repository is a fork of ([<ORIGINAL_REPO_URL>](iemafzalhassan/chattingo)). The application logic itself is unchanged; the focus of this fork is the DevOps tooling layered on top of it.
-
----
-
-## Tech Stack
-
-| Layer        | Technology                          |
-|--------------|--------------------------------------|
-| Frontend     | React                                |
-| Backend      | Spring Boot (Java)                  |
-| Database     | MySQL                               |
-| Containers   | Docker, Docker Compose              |
-| Orchestration| Kubernetes (Minikube/Kind)          |
-| CI/CD        | Jenkins                             |
-| Registry     | Docker Hub                          |
+> ⚠️ **Fork Notice:** This project is forked from [Original Author's GitHub Repo Link].
+> All credit for the original full-stack chat application (React + Spring Boot + WebSocket) goes to the original author.
+> I have used this project to apply and demonstrate real-world DevOps practices including containerization, Kubernetes orchestration, Helm packaging, and CI/CD automation.
 
 ---
 
-## Project Structure
+## 📌 What I Built On Top
+
+| Layer | What I Added |
+|---|---|
+| 🐳 Docker | Containerized frontend, backend & database individually |
+| 🐙 Docker Compose | Multi-container local development setup |
+| ☸️ Kubernetes | Deployments, Services, StatefulSet, Namespace, PV/PVC |
+| ⎈ Helm | Packaged full K8s setup as a reusable Helm Chart |
+| ⚙️ Jenkins | End-to-end CI/CD pipeline for all services |
+
+---
+
+## 🏗️ Architecture Overview
 
 ```
-.
-├── frontend/                 # React application
-│   └── Dockerfile
-├── backend/                  # Spring Boot application
-│   └── Dockerfile
-├── docker-compose.yml         # Multi-container local setup
+Developer Push (GitHub)
+        │
+        ▼
+  Jenkins CI/CD Pipeline
+  ┌──────────────────────────────────────────┐
+  │  1. Checkout Code                        │
+  │  2. Build Docker Images                  │
+  │     ├── Frontend  (React)                │
+  │     ├── Backend   (Spring Boot)          │
+  │     └── Database  (MongoDB/MySQL/etc.)   │
+  │  3. Push Images to Registry              │
+  │  4. Deploy via Helm Chart to Kubernetes  │
+  └──────────────────────────────────────────┘
+        │
+        ▼
+  Kubernetes Cluster
+  ┌──────────────────────────────────────────┐
+  │  Namespace: chat-app                     │
+  │                                          │
+  │  ┌─────────────┐  ┌─────────────┐        │
+  │  │  Frontend   │  │  Backend    │        │
+  │  │ Deployment  │  │ Deployment  │        │
+  │  │  + Service  │  │  + Service  │        │
+  │  └─────────────┘  └─────────────┘        │
+  │                                          │
+  │  ┌─────────────────────────┐             │
+  │  │  Database StatefulSet   │             │
+  │  │  + Service + PV + PVC   │             │
+  │  └─────────────────────────┘             │
+  └──────────────────────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React | Frontend UI |
+| Spring Boot (Java) | Backend REST API |
+| WebSocket | Real-time bidirectional communication |
+| Docker | Containerization of each service |
+| Docker Compose | Local multi-service orchestration |
+| Kubernetes | Container orchestration in cluster |
+| Helm | Kubernetes package manager — templated deployments |
+| Jenkins | CI/CD pipeline automation |
+
+---
+
+## 📁 Project Structure
+
+```
+├── frontend/
+│   ├── src/                    # React source code
+│   └── Dockerfile              # Frontend container
+│
+├── backend/
+│   ├── src/                    # Spring Boot source code
+│   └── Dockerfile              # Backend container
+│
+├── docker-compose.yml          # Local multi-container setup
+│
 ├── k8s/
-│   ├── namespace.yaml
-│   ├── frontend.yaml          # Deployment + Service
-│   ├── backend.yaml           # Deployment + Service
-│   └── database.yaml          # StatefulSet + Service + PV + PVC
-├── Jenkinsfile
-└── README.md
+│   ├── namespace.yaml          # Isolated namespace
+│   ├── frontend/
+│   │   ├── deployment.yaml
+│   │   └── service.yaml
+│   ├── backend/
+│   │   ├── deployment.yaml
+│   │   └── service.yaml
+│   └── database/
+│       ├── statefulset.yaml
+│       ├── service.yaml
+│       ├── pv.yaml
+│       └── pvc.yaml
+│
+├── helm/
+│   └── chat-app/
+│       ├── Chart.yaml
+│       ├── values.yaml         # Configurable values
+│       └── templates/
+│           ├── frontend-deployment.yaml
+│           ├── frontend-service.yaml
+│           ├── backend-deployment.yaml
+│           ├── backend-service.yaml
+│           ├── db-statefulset.yaml
+│           ├── db-service.yaml
+│           ├── pv.yaml
+│           └── pvc.yaml
+│
+└── Jenkinsfile                 # CI/CD pipeline definition
 ```
-
-> Adjust paths above to match your actual repo layout if it differs.
 
 ---
 
-## 1. Containerization with Docker
+## 🐳 Docker & Docker Compose
 
-Each service (frontend, backend, database) has been containerized independently with its own `Dockerfile`.
-
-- **Frontend** – runs the React app on its default development port (3000).
-- **Backend** – uses a Maven base image to build and run the Spring Boot application.
-- **Database** – uses the official `MySQL` image with a mounted volume for data persistence.
-
-### Build images individually
-
+### Build individual images
 ```bash
 # Frontend
-docker build -t <DOCKERHUB_USERNAME>/<PROJECT_NAME>-frontend:latest ./frontend
+docker build -t chat-frontend ./frontend
 
 # Backend
-docker build -t <DOCKERHUB_USERNAME>/<PROJECT_NAME>-backend:latest ./backend
+docker build -t chat-backend ./backend
 ```
 
-### Run the full stack with Docker Compose
-
+### Run locally with Docker Compose
 ```bash
 docker-compose up --build
 ```
 
-This spins up the frontend, backend, and database as separate containers, networked together, simulating a local development environment.
-
-```bash
-docker-compose down -v   # tear down, including volumes
-```
+Access the app at `http://localhost:3000`
 
 ---
 
-## 2. Kubernetes Deployment
+## ☸️ Kubernetes Setup
 
-The Docker Compose setup was migrated to Kubernetes to simulate a production-grade orchestration environment.
+### Prerequisites
+- A running Kubernetes cluster (local: Minikube / Kind, or cloud: EKS / GKE)
+- `kubectl` configured and connected to your cluster
 
-### Namespace
-
-A dedicated namespace isolates all resources for this project from the rest of the cluster.
+### Deploy with raw manifests
 
 ```bash
+# Create namespace
 kubectl apply -f k8s/namespace.yaml
-```
 
-### Frontend & Backend — Deployment + Service
+# Deploy database (StatefulSet + PV + PVC)
+kubectl apply -f k8s/database/
 
-The frontend and backend are stateless, so they're managed via standard `Deployment` + `Service` objects, allowing easy scaling and rolling updates.
+# Deploy backend
+kubectl apply -f k8s/backend/
 
-```bash
-kubectl apply -f k8s/frontend.yaml
+# Deploy frontend
+kubectl apply -f k8s/frontend/
 
-kubectl apply -f k8s/backend.yaml
-```
-
-### Database — StatefulSet + Service + PV/PVC
-
-The database is stateful, so it's managed via a `StatefulSet` with stable network identity, paired with a headless `Service`. Persistent storage is provisioned through `PersistentVolume` (PV) and `PersistentVolumeClaim` (PVC) so data survives pod restarts/rescheduling.
-
-```bash
-kubectl apply -f k8s/database.yaml
-```
-
-### Verify the deployment
-
-```bash
-kubectl get all -n <NAMESPACE_NAME>
-kubectl get pv,pvc -n <NAMESPACE_NAME>
-```
-
-### Local cluster access (Minikube/Kind)
-
-Since this is running on a local cluster, services are exposed via `NodePort` / `minikube service` (adjust based on your actual Service type):
-
-```bash
-minikube service <FRONTEND_SERVICE_NAME> -n <NAMESPACE_NAME>
+# Verify everything is running
+kubectl get all -n chat-app
+kubectl get pv,pvc -n chat-app
 ```
 
 ---
 
-## 3. CI/CD with Jenkins
+## ⎈ Helm Deployment
 
-A Jenkins pipeline automates building, pushing, and deploying the application on every change, removing the need for manual Docker builds and `kubectl apply` commands.
-
-### Pipeline stages
-
-1. **Checkout** – pulls the latest code from the repository.
-2. **Build** – builds Docker images for frontend and backend.
-3. **Push** – pushes the built images to Docker Hub.
-4. **Deploy** – applies the updated Kubernetes manifests to the cluster (`kubectl apply`), triggering a rolling update of the Deployments.
-
-### Prerequisites for the Jenkins pipeline
-
-- Jenkins with Docker installed/accessible on the agent.
-- `kubectl` configured on the Jenkins agent with access to the Minikube/Kind cluster.
-- Docker Hub credentials stored in Jenkins as a credential (`dockerhub-creds` in the example above).
-
----
-
-## Local Setup — Quick Start
-
+### Install the chart
 ```bash
-# 1. Clone the repo
-git clone <REPO_URL>
-cd <PROJECT_NAME>
+helm install chat-app ./helm/chat-app \
+  --namespace chat-app \
+  --create-namespace
+```
 
-# 2. Run with Docker Compose (simplest local dev setup)
-docker-compose up --build
+### Upgrade after changes
+```bash
+helm upgrade chat-app ./helm/chat-app --namespace chat-app
+```
 
-# OR
+### Uninstall
+```bash
+helm uninstall chat-app --namespace chat-app
+```
 
-# 3. Deploy to local Kubernetes (Minikube/Kind)
-minikube start
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/ -n <NAMESPACE_NAME>
-
-# 4. Trigger Jenkins pipeline (manually or via webhook) for full CI/CD flow
+### Override values for different environments
+```bash
+# For production
+helm install chat-app ./helm/chat-app \
+  --namespace chat-app \
+  -f helm/chat-app/values-prod.yaml
 ```
 
 ---
 
-## What This Project Demonstrates
+## ⚙️ Jenkins CI/CD Pipeline
 
-- Containerizing a multi-service application (frontend, backend, database) with Docker.
-- Local multi-container orchestration with Docker Compose.
-- Kubernetes fundamentals: Namespaces, Deployments, Services, StatefulSets, PV/PVC.
-- Separating stateless workloads (frontend/backend) from stateful workloads (database) and choosing the right Kubernetes objects for each.
-- Building a CI/CD pipeline with Jenkins to automate image builds, registry pushes, and cluster deployments.
+The `Jenkinsfile` automates the following stages:
+
+```
+┌─────────────────────────────────────────────────┐
+│  Stage 1 → Checkout Code from GitHub            │
+│  Stage 2 → Build Docker Images (all services)   │
+│  Stage 3 → Push Images to Registry              │
+│  Stage 4 → Deploy using Helm Chart to K8s       │
+└─────────────────────────────────────────────────┘
+```
+
+### Jenkinsfile snippet
+```groovy
+pipeline {
+    agent any
+    environment {
+        IMAGE_FRONTEND = "your-registry/chat-frontend"
+        IMAGE_BACKEND  = "your-registry/chat-backend"
+        NAMESPACE      = "chat-app"
+    }
+    stages {
+        stage('Checkout')         { steps { checkout scm } }
+        stage('Build Images')     { steps { sh 'docker-compose build' } }
+        stage('Push Images')      { steps { /* push to registry */ } }
+        stage('Deploy with Helm') {
+            steps {
+                sh 'helm upgrade --install chat-app ./helm/chat-app --namespace ${NAMESPACE} --create-namespace'
+            }
+        }
+    }
+}
+```
 
 ---
 
-## Future Improvements (optional section — fill in as you go)
+## 🗄️ Persistent Storage
 
-- [ ] Add Helm charts to templatize the Kubernetes manifests.
-- [ ] Add Ingress + TLS instead of NodePort access.
-- [ ] Add HPA (Horizontal Pod Autoscaler) for frontend/backend.
-- [ ] Add monitoring (Prometheus + Grafana).
-- [ ] Move from local Minikube/Kind to a managed cloud Kubernetes cluster (EKS/GKE/AKS).
-- [ ] Add automated tests as a pipeline stage before build/deploy.
+The database uses **Persistent Volume (PV)** and **Persistent Volume Claim (PVC)** to ensure data is not lost when the database pod restarts.
+
+```
+PersistentVolume (PV)        ← Actual storage on the node/cloud
+        │
+PersistentVolumeClaim (PVC)  ← Request for storage by the pod
+        │
+StatefulSet (Database Pod)   ← Uses the PVC to read/write data
+```
 
 ---
 
-## License
+## 🌐 Namespace Isolation
 
-This project is based on a forked open-source repository. Refer to the original repository's license for terms governing the application code. DevOps configuration files (Docker, Kubernetes manifests, Jenkinsfile) added in this fork are free to use/reference.
+All resources are deployed under a dedicated namespace:
+
+```bash
+kubectl get all -n chat-app
+```
+
+This keeps the chat app resources isolated from other workloads on the cluster.
+
+---
+
+## 🎯 Key DevOps Concepts Demonstrated
+
+- ✅ Multi-service containerization with Docker
+- ✅ Local orchestration with Docker Compose
+- ✅ Kubernetes Deployments for stateless services
+- ✅ Kubernetes StatefulSet for stateful database workloads
+- ✅ Persistent Volumes for durable data storage
+- ✅ Namespace-based environment isolation
+- ✅ Helm Chart for templated, reusable K8s deployments
+- ✅ Jenkins CI/CD for end-to-end automated delivery
+
+---
+
+## 📸 Screenshots
+
+> *(Add screenshots here: Jenkins pipeline, Helm install output, kubectl get all -n chat-app, running app)*
+
+---
+
+## 👤 About Me
+
+**Your Name**
+- 🔗 LinkedIn: [linkedin.com/in/your-profile](https://linkedin.com/in/satnamgrover)
+- 🐙 GitHub: [github.com/your-username](https://github.com/satnamgrover)
