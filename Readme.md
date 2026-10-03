@@ -8,7 +8,7 @@
 ![Helm](https://img.shields.io/badge/Helm-0F1689?style=for-the-badge&logo=helm&logoColor=white)
 ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
 
-> ⚠️ **Fork Notice:** This project is forked from [Original Author's GitHub Repo Link].
+> ⚠️ **Fork Notice:** This project is forked from https://github.com/iemafzalhassan/chattingo.git.
 > All credit for the original full-stack chat application (React + Spring Boot + WebSocket) goes to the original author.
 > I have used this project to apply and demonstrate real-world DevOps practices including containerization, Kubernetes orchestration, Helm packaging, and CI/CD automation.
 
@@ -279,7 +279,15 @@ This keeps the chat app resources isolated from other workloads on the cluster.
 
 ## 📸 Screenshots
 
-> *(Add screenshots here: Jenkins pipeline, Helm install output, kubectl get all -n chat-app, running app)*
+### helm install
+![helm](Screenshots/helm.png)
+
+### k8s get all -n chat-app
+![kubectl get all -n chat-app](Screenshots/k8s.png)
+
+### live application
+![Live Application](Screenshots/application1.png)
+![live Application](Screenshots/application2.png)
 
 ---
 
