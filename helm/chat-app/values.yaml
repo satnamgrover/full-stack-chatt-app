@@ -10,9 +10,9 @@ frontend:
   containerName: frontend-container
 
   image:
-    repository: <Your Image Name>
+    repository: frontend
     tag: latest
-    pullPolicy: ifNotPersent
+    pullPolicy: Never
 
   containerPort: 3000
   browser: "none"
@@ -33,9 +33,9 @@ backend:
   containerName: backend-container
 
   image:
-    repository: <Your Image Name>
+    repository: backend
     tag: latest
-    pullPolicy: IfNotPersent
+    pullPolicy: Never
 
   database:
     url: jdbc:mysql://mysql:3306/chattingo
@@ -82,7 +82,7 @@ database:
 
 # Secret
 backendSecret:
-  jwtSecret: "< Your Jwt Secret key >"
-  mysqlUser: "< Your Database Username >"
-  mysqlPass: "< Your User Pass >"
-  mysqlRoot: "< Your Root Pass >"
+  jwtSecret: "z9iomEpv/QtMfd2HTXnLzGt/7+R7I38m9k0T4L7GJa0="
+  mysqlUser: "admin123"
+  mysqlPass: "admin"
+  mysqlRoot: "password"
